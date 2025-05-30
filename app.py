@@ -4,7 +4,6 @@ import numpy as np
 import pickle
 from sklearn.preprocessing import PowerTransformer
 
-
 # Load saved objects
 with open('lr_model.pkl', 'rb') as f:
     lr_model = pickle.load(f)
@@ -21,9 +20,12 @@ with open('selected_features.pkl', 'rb') as f:
 with open('campaign_yeojohnson_transformer.pkl', 'rb') as f:
     campaign_transformer = pickle.load(f)
 
-# Define columns
+# Determine which numeric and categorical features are actually used in the model
 categorical_cols = [col for col in selected_features if col in label_encoders]
 numeric_cols = [col for col in selected_features if col not in categorical_cols]
+
+# Final numeric columns to scale
+final_numeric_cols = [col for col in selected_features if col in numeric_cols]
 
 # UI
 st.title("💼 Bank Deposit Prediction App")
@@ -57,6 +59,7 @@ for col in numeric_cols:
         user_input[col] = np.sqrt(pdays) if pdays is not None else 0
     elif col == 'previous_yeojohnson':
         previous = st.number_input("Number of Previous Contacts", value=0)
+        # Use PowerTransformer directly, instead of re-fitting it every time
         previous_pt = PowerTransformer(method='yeo-johnson')
         user_input[col] = previous_pt.fit_transform([[previous]])[0][0]
     else:
@@ -74,10 +77,10 @@ if st.button("🔮 Predict"):
     # Create DataFrame
     df_input = pd.DataFrame([user_input])
 
-    # Apply scaling to numeric features
-    df_input[numeric_cols] = scaler.transform(df_input[numeric_cols])
+    # Apply scaling to final numeric features only
+    df_input[final_numeric_cols] = scaler.transform(df_input[final_numeric_cols])
 
-    # Filter selected features
+    # Filter final selected features
     df_input = df_input[selected_features]
 
     # Predict
