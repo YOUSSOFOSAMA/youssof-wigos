@@ -298,17 +298,13 @@ plt.show()
 final_features = [
     'age',  
     'job',       
-    'marital', 
-    'education',
-    'default',            
+    'education',         
     'balance_log', 
     'housing',
     'loan' ,
-    'contact',
     'day',      
     'month',
-    'duration_sqrt',            
-    'campaign_yeojohnson',     
+    'duration_sqrt',                
     'pdays_sqrt',           
     'previous_yeojohnson',     
     'poutcome',
@@ -317,8 +313,8 @@ final_features = [
 X = data[final_features].copy()
 y = data['deposit'].apply(lambda x: 1 if x == 'yes' else 0)
 
-categorical_cols = ['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'poutcome']
-numeric_cols = ['age', 'balance_log', 'day', 'duration_sqrt', 'campaign_yeojohnson', 'pdays_sqrt', 'previous_yeojohnson']
+categorical_cols = ['job', 'education', 'housing', 'loan', 'month', 'poutcome']
+numeric_cols = ['age', 'balance_log', 'day', 'duration_sqrt', 'pdays_sqrt', 'previous_yeojohnson']
 
 #One hot encoder
 #X_encoded = p.get_dummies(X[categorical_cols], drop_first=True)
@@ -335,26 +331,26 @@ for col in categorical_cols:
 scaler = StandardScaler()
 X[numeric_cols] = scaler.fit_transform(X[numeric_cols])
 
-mi_scores = mutual_info_classif(X, y, random_state=42)
-mi_results = p.Series(mi_scores, index=X.columns).sort_values(ascending=False)
+#mi_scores = mutual_info_classif(X, y, random_state=42)
+#mi_results = p.Series(mi_scores, index=X.columns).sort_values(ascending=False)
 
 # Visualize top 10 features
-mi_results.head(10).plot(kind='barh')
-plt.title("Top 10 Features by Mutual Information")
-plt.xlabel("MI Score")
-plt.ylabel("Feature")
-plt.gca().invert_yaxis()
-plt.show()
+#mi_results.head(10).plot(kind='barh')
+#plt.title("Top 10 Features by Mutual Information")
+#plt.xlabel("MI Score")
+#plt.ylabel("Feature")
+#plt.gca().invert_yaxis()
+#plt.show()
 
-threshold = 0.01  # Adjust this as needed
-selected_features = mi_results[mi_results > threshold].index.tolist()
-X_selected = X[selected_features]
+#threshold = 0.01  # Adjust this as needed
+#selected_features = mi_results[mi_results > threshold].index.tolist()
+#X_selected = X[selected_features]
 
-print(f"✅ Features with MI > {threshold}: {len(selected_features)} kept")
+#print(f"✅ Features with MI > {threshold}: {len(selected_features)} kept")
 
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(
-    X_selected, y, test_size=0.2, random_state=42, stratify=y)
+    X, y, test_size=0.2, random_state=42, stratify=y)
 
 # Logistic Regression
 lr_model = LogisticRegression(max_iter=1000, random_state=42)
@@ -391,6 +387,3 @@ with open("label_encoders.pkl", "wb") as f:
 # Save scaler
 with open("scaler.pkl", "wb") as f:
     pickle.dump(scaler, f)
-    
-with open("selected_features.pkl", "wb") as f:
-    pickle.dump(selected_features, f)
