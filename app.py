@@ -14,18 +14,31 @@ with open('scaler.pkl', 'rb') as f:
 with open('label_encoders.pkl', 'rb') as f:
     label_encoders = pickle.load(f)
 
-with open('selected_features.pkl', 'rb') as f:
-    selected_features = pickle.load(f)
-
 with open('campaign_yeojohnson_transformer.pkl', 'rb') as f:
     campaign_transformer = pickle.load(f)
 
-# Determine which numeric and categorical features are actually used in the model
-categorical_cols = [col for col in selected_features if col in label_encoders]
-numeric_cols = [col for col in selected_features if col not in categorical_cols]
+# Final features to use
+final_features = [
+    'age',  
+    'job',       
+    'education',         
+    'balance_log', 
+    'housing',
+    'loan' ,
+    'day',      
+    'month',
+    'duration_sqrt',                
+    'pdays_sqrt',           
+    'previous_yeojohnson',     
+    'poutcome',
+]
+
+# Determine categorical and numeric columns
+categorical_cols = [col for col in final_features if col in label_encoders]
+numeric_cols = [col for col in final_features if col not in categorical_cols]
 
 # Final numeric columns to scale
-final_numeric_cols = [col for col in selected_features if col in numeric_cols]
+final_numeric_cols = [col for col in final_features if col in numeric_cols]
 
 # UI
 st.title("💼 Bank Deposit Prediction App")
@@ -59,7 +72,7 @@ for col in numeric_cols:
         user_input[col] = np.sqrt(pdays) if pdays is not None else 0
     elif col == 'previous_yeojohnson':
         previous = st.number_input("Number of Previous Contacts", value=0)
-        # Use PowerTransformer directly, instead of re-fitting it every time
+        # Use PowerTransformer directly (note: should be trained transformer ideally)
         previous_pt = PowerTransformer(method='yeo-johnson')
         user_input[col] = previous_pt.fit_transform([[previous]])[0][0]
     else:
@@ -80,8 +93,8 @@ if st.button("🔮 Predict"):
     # Apply scaling to final numeric features only
     df_input[final_numeric_cols] = scaler.transform(df_input[final_numeric_cols])
 
-    # Filter final selected features
-    df_input = df_input[selected_features]
+    # Filter final features (if needed)
+    df_input = df_input[final_features]
 
     # Predict
     prediction = lr_model.predict(df_input)[0]
