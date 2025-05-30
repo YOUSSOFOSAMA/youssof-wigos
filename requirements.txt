@@ -63,3 +63,15 @@ tzdata==2025.2
 urllib3==2.4.0
 watchdog==6.0.0
 wheel==0.44.0
+import pandas as p
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import PowerTransformer
+from sklearn.feature_selection import mutual_info_classif
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import pickle
+import streamlit as st
