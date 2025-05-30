@@ -67,7 +67,7 @@ for col in numeric_cols:
         campaign = st.number_input("Number of Contacts During Campaign", value=1)
         user_input[col] = campaign_transformer.transform([[campaign]])[0][0]
     elif col == 'pdays_sqrt':
-        pdays = st.number_input("Days Since Last Contact (999 if never contacted)", value=999)
+        pdays = st.number_input("Days Since Last Contact", value=0)
         pdays = np.nan if pdays in [999, -1] else pdays
         user_input[col] = np.sqrt(pdays) if pdays is not None else 0
     elif col == 'previous_yeojohnson':
