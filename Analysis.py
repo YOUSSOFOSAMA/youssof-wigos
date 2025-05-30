@@ -331,10 +331,6 @@ for col in categorical_cols:
     X[col] = le.fit_transform(X[col])
     label_encoders[col] = le
 
-# Scale numeric features
-scaler = StandardScaler()
-X[numeric_cols] = scaler.fit_transform(X[numeric_cols])
-
 mi_scores = mutual_info_classif(X, y, random_state=42)
 mi_results = p.Series(mi_scores, index=X.columns).sort_values(ascending=False)
 
@@ -348,9 +344,12 @@ plt.show()
 
 threshold = 0.01  # Adjust this as needed
 selected_features = mi_results[mi_results > threshold].index.tolist()
-X_selected = X[selected_features]
 
 print(f"✅ Features with MI > {threshold}: {len(selected_features)} kept")
+
+# Scale numeric features
+scaler = StandardScaler()
+X_selected = scaler.fit_transform(X[selected_features])
 
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(
