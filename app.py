@@ -93,9 +93,6 @@ if st.button("🔮 Predict"):
     # Apply scaling to final numeric features only
     df_input[final_numeric_cols] = scaler.transform(df_input[final_numeric_cols])
 
-    # Filter final features (if needed)
-    df_input = df_input[final_features]
-
     # Predict
     prediction = lr_model.predict(df_input)[0]
     probability = lr_model.predict_proba(df_input)[0][1]
